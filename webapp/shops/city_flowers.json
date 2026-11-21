@@ -1,0 +1,29 @@
+{
+  "business_name": "City Flowers (DEMO)",
+  "welcome_photo": "https://images.unsplash.com/photo-1565695951564-007d8f297e48?w=1080&q=80&fm=jpg&fit=max",
+  "photo_note": {"ru": "📷 Фото для примера — в вашем боте будут ваши фото", "uz": "📷 Namuna uchun rasm — botingizda o'z rasmlaringiz bo'ladi", "en": "📷 Sample photo"},
+  "languages": ["ru", "uz"], "default_language": "ru", "owner_language": "ru",
+  "currency": {"ru": "сум", "uz": "so'm", "en": "UZS"},
+  "delivery": {"enabled": true, "fee": null},
+  "pickup_address": {"ru": "Ташкент, ул. Нукус, 69", "uz": "Toshkent, Nukus ko'chasi, 69"},
+  "about": {
+    "ru": "🌷 <b>City Flowers</b> — демо-версия бота, сделанная специально для вас.\nЦены взяты из открытой подборки Afisha.uz (март 2026) — только для примера; в настоящем боте будут ваши актуальные цены и фото.\n📍 ул. Нукус, 69",
+    "uz": "🌷 <b>City Flowers</b> — siz uchun maxsus tayyorlangan botning demo-versiyasi.\nNarxlar Afisha.uz ochiq ro'yxatidan olingan (2026-yil mart) — faqat namuna uchun; haqiqiy botda sizning joriy narxlaringiz va rasmlaringiz bo'ladi.\n📍 Nukus ko'chasi, 69"
+  },
+  "faq": [
+    {"q": {"ru": "Куда приходят заказы?", "uz": "Buyurtmalar qayerga keladi?"},
+     "a": {"ru": "В вашу группу в Telegram. Оформите тестовый заказ — и увидите, как выглядит заявка.", "uz": "Telegramdagi guruhingizga. Sinov buyurtmasini bering — buyurtma qanday ko'rinishini ko'rasiz."}},
+    {"q": {"ru": "Как менять товары и цены?", "uz": "Mahsulot va narxlarni qanday o'zgartiraman?"},
+     "a": {"ru": "Присылаете прайс или фото — я обновляю бота.", "uz": "Narxlar ro'yxati yoki rasmni yuborasiz — men botni yangilayman."}}
+  ],
+  "categories": [
+    {"id": "tulips", "title": {"ru": "🌷 Тюльпаны", "uz": "🌷 Lolalar"}, "items": [
+      {"id": "i1", "price": 450000, "photo": "https://images.unsplash.com/photo-1586968295564-92fd7572718b?w=1080&q=80&fm=jpg&fit=max", "title": {"ru": "15 тюльпанов", "uz": "15 ta lola"}, "description": {"ru": "", "uz": ""}},
+      {"id": "i2", "price": 700000, "photo": "https://images.unsplash.com/photo-1518701005037-d53b1f67bb1c?w=1080&q=80&fm=jpg&fit=max", "title": {"ru": "25 тюльпанов", "uz": "25 ta lola"}, "description": {"ru": "", "uz": ""}},
+      {"id": "i3", "price": 900000, "photo": "https://images.unsplash.com/photo-1589994160839-163cd867cfe8?w=1080&q=80&fm=jpg&fit=max", "title": {"ru": "35 тюльпанов", "uz": "35 ta lola"}, "description": {"ru": "", "uz": ""}}
+    ]},
+    {"id": "bouquets", "title": {"ru": "💐 Композиции", "uz": "💐 Kompozitsiyalar"}, "items": [
+      {"id": "i4", "price": 1500000, "photo": "https://images.unsplash.com/photo-1494336956603-39a3641efa1c?w=1080&q=80&fm=jpg&fit=max", "title": {"ru": "Композиция в корзине", "uz": "Savatdagi kompozitsiya"}, "description": {"ru": "", "uz": ""}}
+    ]}
+  ]
+}

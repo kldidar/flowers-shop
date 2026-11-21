@@ -198,7 +198,10 @@ img{display:block;max-width:100%}
 <script>
 "use strict";
 const tg = window.Telegram && window.Telegram.WebApp;
-const inTG = !!(tg && tg.initData);           // false in a normal browser (preview mode)
+// Inside Telegram the platform is "android", "ios", "tdesktop", "weba"…; in a normal browser
+// it is "unknown". (initData can't be used for this: it is EMPTY when the app is opened from
+// a keyboard button, which is exactly how this shop is opened.)
+const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
 const qs = new URLSearchParams(location.search);
 const slug = (qs.get("shop") || "example_flowers").replace(/[^a-z0-9_]/gi, "");
 

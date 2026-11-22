@@ -249,6 +249,7 @@ const tg = window.Telegram && window.Telegram.WebApp;
 const inTG = !!(tg && tg.platform && tg.platform !== "unknown");
 const qs = new URLSearchParams(location.search);
 const slug = (qs.get("shop") || "example_flowers").replace(/[^a-z0-9_]/gi, "");
+const showPreview = !inTG && !qs.get("embed");   // ?embed=1: shown inside the portfolio, no browser note
 
 const T = {
   ru: {
@@ -378,7 +379,7 @@ function render() {
         <i>${I.arrowUR}</i>
       </button>
     </section>
-    ${inTG ? "" : `<div class="preview">${esc(t("preview"))}</div>`}
+    ${showPreview ? `<div class="preview">${esc(t("preview"))}</div>` : ""}
     <nav class="tabs" id="tabs"></nav>
     <main id="catalog"></main>
   </div>`;
@@ -588,7 +589,7 @@ function renderCheckout() {
       ${method === "delivery" ? `<div><span>${esc(t("deliveryFee"))}</span><span>${esc(feeTxt)}</span></div>` : ""}
       <div class="all"><span>${esc(t("total"))}</span><span>${esc(money(sub + fee()))}</span></div></div>
     <div class="pay"><span>💳</span><span>${esc(loc((shop.payment || {}).info) || t("payDefault"))}</span></div>
-    ${inTG ? "" : `<div class="preview" style="margin:14px 0 0">${esc(t("preview"))}</div>`}
+    ${showPreview ? `<div class="preview" style="margin:14px 0 0">${esc(t("preview"))}</div>` : ""}
   </div>
   <div class="pbar"><div class="pbar-in"><b>${esc(money(sub + fee()))}</b><button class="btn" id="submit">${esc(t("confirm"))} ${I.arrow}</button></div></div>`;
 }
@@ -624,7 +625,7 @@ function submit() {
   view = "done"; syncBack();
   $("#page").innerHTML = `<div class="pwrap"><div class="done"><div class="ok">🎉</div><h2 class="serif">${esc(t("sent"))}</h2>
     <p>${esc(t("sentText"))}</p><button class="btn" data-act="home">${esc(t("back"))} ${I.arrow}</button>
-    <div class="preview" style="margin:18px 0 0">${esc(t("preview"))}</div></div></div>`;
+    ${showPreview ? `<div class="preview" style="margin:18px 0 0">${esc(t("preview"))}</div>` : ""}</div></div>`;
   $("#page").scrollTop = 0;
 }
 

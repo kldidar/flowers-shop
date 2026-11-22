@@ -1,0 +1,347 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Telegram-боты для бизнеса</title>
+<meta name="description" content="Демо-проект: Telegram-бот для заказов и магазин внутри Telegram (Mini App) для цветочного магазина.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* Portfolio page. Put this file in the ROOT of the GitHub repo (next to the webapp/ folder).
+   Set your Telegram username in the TG constant at the bottom of the page. */
+:root{
+  --bg:#F6F4F8; --card:#FFFFFF; --ink:#18161B; --muted:#76707C; --line:#E9E4EE; --chip:#EFEBF3;
+  --accent:#B3123F; --soft:#F5E3EC; --btn:#18161B; --btn-ink:#fff;
+  --bubble:#FFFFFF; --mine:#E3F5D8; --chatbg:#DCE6D3; --shadow:0 14px 40px rgba(24,22,27,.08);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#131115; --card:#1D1A20; --ink:#F4F0F5; --muted:#A49EA9; --line:#2C2830; --chip:#28242C;
+    --soft:#3A2431; --btn:#F4F0F5; --btn-ink:#131115; --bubble:#25222A; --mine:#2E4A2A; --chatbg:#0F1A14;
+    --shadow:0 14px 40px rgba(0,0,0,.4);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Manrope,system-ui,-apple-system,Segoe UI,Roboto,sans-serif;font-size:16px;line-height:1.5}
+a{color:inherit}
+button{font:inherit;color:inherit;border:0;background:none;cursor:pointer;padding:0}
+.serif{font-family:"Cormorant Garamond",Georgia,serif}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+
+/* top bar */
+.top{display:flex;align-items:center;gap:12px;padding:18px 0}
+.logo{flex:1;font-weight:800;font-size:15px;display:flex;align-items:center;gap:10px}
+.logo i{width:38px;height:38px;border-radius:12px;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center;font-style:normal;font-size:18px}
+.lang{display:flex;padding:4px;border-radius:99px;background:var(--chip)}
+.lang button{width:38px;height:34px;border-radius:99px;font-size:12px;font-weight:800;color:var(--muted)}
+.lang button.on{background:var(--btn);color:var(--btn-ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;height:52px;padding:0 24px;border-radius:99px;
+  background:var(--btn);color:var(--btn-ink);font-weight:700;text-decoration:none;white-space:nowrap;transition:transform .12s}
+.btn:active{transform:scale(.97)}
+.btn.ghost{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+.btn.sm{height:42px;padding:0 18px;font-size:14px}
+[hidden]{display:none!important}
+
+/* hero */
+.hero{display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center;padding:28px 0 56px}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;color:var(--accent)}
+.hero h1{margin:14px 0 14px;font-size:clamp(40px,6vw,68px);line-height:1;font-weight:600}
+.hero p{margin:0 0 26px;color:var(--muted);font-size:17px;max-width:34em}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.facts{display:flex;gap:22px;flex-wrap:wrap;margin-top:30px}
+.facts div b{display:block;font-size:22px}
+.facts div span{color:var(--muted);font-size:13px}
+
+/* phone with the live shop */
+/* the shop is rendered at a real phone width (375px) and scaled down to fit the frame */
+.phone{--w:320px;--h:660px;--k:calc((320 - 22) / 375);justify-self:center;width:var(--w);height:var(--h);border-radius:48px;background:#121014;padding:11px;
+  box-shadow:0 30px 70px rgba(24,22,27,.25);position:relative;margin:0 auto}
+.phone::before{content:"";position:absolute;top:17px;left:50%;transform:translateX(-50%);width:70px;height:20px;border-radius:99px;background:#121014;z-index:2}
+.screen{width:100%;height:100%;border-radius:38px;overflow:hidden;background:#F6F4F8}
+.phone iframe{width:375px;height:calc((var(--h) - 22px) / var(--k));border:0;transform:scale(var(--k));transform-origin:0 0;display:block}
+.live{display:flex;justify-content:center;gap:8px;align-items:center;margin-top:14px;font-size:13px;color:var(--muted);font-weight:600}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:#1F8A5B;box-shadow:0 0 0 4px rgba(31,138,91,.18)}
+
+/* sections */
+section.s{padding:56px 0}
+.s h2{margin:10px 0 10px;font-size:clamp(34px,4.5vw,48px);line-height:1.05;font-weight:600}
+.lead{color:var(--muted);margin:0 0 28px;max-width:40em}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:28px;padding:26px;box-shadow:var(--shadow)}
+.card .tag{display:inline-block;font-size:12px;font-weight:800;padding:6px 12px;border-radius:99px;background:var(--soft);color:var(--accent)}
+.card h3{margin:14px 0 8px;font-size:30px;line-height:1.1;font-weight:600}
+.card p{margin:0 0 14px;color:var(--muted)}
+.card ul{margin:0;padding:0;list-style:none;display:grid;gap:9px}
+.card li{display:flex;gap:10px;font-size:15px}
+.card li::before{content:"✓";flex:none;width:22px;height:22px;border-radius:50%;background:var(--btn);color:var(--btn-ink);display:grid;place-items:center;font-size:12px;font-weight:800;margin-top:1px}
+
+/* chat mock (texts are the real bot's texts) */
+.chatgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.chat{border-radius:28px;overflow:hidden;border:1px solid var(--line);background:var(--chatbg);box-shadow:var(--shadow)}
+.chat .head{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--card);border-bottom:1px solid var(--line)}
+.chat .ava{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#F3A6BE,var(--accent));display:grid;place-items:center;font-size:18px}
+.chat .head b{display:block;font-size:14.5px}
+.chat .head small{color:var(--muted);font-size:12px}
+.msgs{padding:16px 12px;display:flex;flex-direction:column;gap:8px;min-height:360px}
+.m{max-width:86%;background:var(--bubble);border-radius:16px 16px 16px 4px;padding:9px 12px;font-size:14px;line-height:1.45;box-shadow:0 1px 1px rgba(0,0,0,.06)}
+.m.me{align-self:flex-end;background:var(--mine);border-radius:16px 16px 4px 16px}
+.m hr{border:0;border-top:1px dashed var(--line);margin:6px 0}
+.kb{display:grid;gap:4px;max-width:86%}
+.kb span{display:block;text-align:center;background:rgba(255,255,255,.55);color:#1d2b1f;border-radius:10px;padding:8px;font-size:13px;font-weight:700}
+.kb span.g{background:#2FA84F;color:#fff}
+.kb span.b{background:#2F7BEA;color:#fff}
+.cap{text-align:center;color:var(--muted);font-size:13px;margin-top:10px}
+
+/* steps + adapt */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;counter-reset:s}
+.step{background:var(--card);border:1px solid var(--line);border-radius:24px;padding:22px}
+.step::before{counter-increment:s;content:counter(s);display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--soft);color:var(--accent);font-weight:800;margin-bottom:12px}
+.step b{display:block;font-size:17px;margin-bottom:4px}
+.step span{color:var(--muted);font-size:14.5px}
+.feat{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+.feat div{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px;font-size:14px;font-weight:600}
+.feat div i{display:block;font-style:normal;font-size:22px;margin-bottom:6px}
+.adapt{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.adapt div{border-radius:24px;padding:22px;background:var(--btn);color:var(--btn-ink)}
+.adapt div i{font-style:normal;font-size:28px}
+.adapt div b{display:block;font-size:18px;margin:10px 0 4px}
+.adapt div span{opacity:.75;font-size:14px}
+
+.cta{margin:30px 0 60px;border-radius:34px;padding:40px 28px;text-align:center;background:linear-gradient(150deg,var(--accent),#3A0E1F);color:#fff}
+.cta h2{margin:0 0 10px;font-size:clamp(32px,4.5vw,46px);font-weight:600;line-height:1.05}
+.cta p{margin:0 auto 22px;opacity:.85;max-width:34em}
+.cta .btn{background:#fff;color:#18161B}
+footer{color:var(--muted);font-size:13px;padding:0 0 40px;text-align:center}
+
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr;gap:34px;padding-top:12px}
+  .two,.chatgrid{grid-template-columns:1fr}
+  .steps,.adapt{grid-template-columns:1fr}
+  .feat{grid-template-columns:repeat(2,1fr)}
+  section.s{padding:40px 0}
+}
+@media (max-width:380px){.phone{--w:290px;--h:600px;--k:calc((290 - 22) / 375)}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="logo"><i>✈</i><span data-i="brand"></span></div>
+    <div class="lang"><button data-lang="ru">RU</button><button data-lang="uz">UZ</button></div>
+    <a class="btn sm contact" target="_blank" rel="noopener" data-i="write"></a>
+  </header>
+
+  <section class="hero">
+    <div>
+      <span class="eyebrow">🌸 <span data-i="heroTag"></span></span>
+      <h1 class="serif" data-i="heroTitle"></h1>
+      <p data-i="heroText"></p>
+      <div class="row">
+        <a class="btn" id="openShop" target="_blank" rel="noopener"><span data-i="openShop"></span> →</a>
+        <a class="btn ghost contact" target="_blank" rel="noopener" data-i="ask"></a>
+      </div>
+      <div class="facts">
+        <div><b>RU · UZ</b><span data-i="f1"></span></div>
+        <div><b data-i="f2b"></b><span data-i="f2"></span></div>
+        <div><b>24/7</b><span data-i="f3"></span></div>
+      </div>
+    </div>
+    <div>
+      <div class="phone"><div class="screen"><iframe id="shopFrame" title="Demo shop"></iframe></div></div>
+      <div class="live" data-i="live"></div>
+    </div>
+  </section>
+
+  <section class="s">
+    <span class="eyebrow" data-i="vTag"></span>
+    <h2 class="serif" data-i="vTitle"></h2>
+    <p class="lead" data-i="vLead"></p>
+    <div class="two">
+      <div class="card"><span class="tag" data-i="aTag"></span><h3 class="serif" data-i="aTitle"></h3><p data-i="aText"></p><ul data-list="aList"></ul></div>
+      <div class="card"><span class="tag" data-i="bTag"></span><h3 class="serif" data-i="bTitle"></h3><p data-i="bText"></p><ul data-list="bList"></ul></div>
+    </div>
+  </section>
+
+  <section class="s">
+    <span class="eyebrow" data-i="cTag"></span>
+    <h2 class="serif" data-i="cTitle"></h2>
+    <p class="lead" data-i="cLead"></p>
+    <div class="chatgrid">
+      <div>
+        <div class="chat">
+          <div class="head"><div class="ava">🌸</div><div><b>Gulzor Flowers</b><small data-i="bot"></small></div></div>
+          <div class="msgs" id="chatA"></div>
+        </div>
+        <div class="cap" data-i="capA"></div>
+      </div>
+      <div>
+        <div class="chat">
+          <div class="head"><div class="ava">📦</div><div><b data-i="groupName"></b><small data-i="group"></small></div></div>
+          <div class="msgs" id="chatB"></div>
+        </div>
+        <div class="cap" data-i="capB"></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="s">
+    <span class="eyebrow" data-i="hTag"></span>
+    <h2 class="serif" data-i="hTitle"></h2>
+    <div class="steps"><div class="step"><b data-i="s1b"></b><span data-i="s1"></span></div>
+      <div class="step"><b data-i="s2b"></b><span data-i="s2"></span></div>
+      <div class="step"><b data-i="s3b"></b><span data-i="s3"></span></div></div>
+    <div class="feat" id="feat" style="margin-top:16px"></div>
+  </section>
+
+  <section class="s">
+    <span class="eyebrow" data-i="adTag"></span>
+    <h2 class="serif" data-i="adTitle"></h2>
+    <p class="lead" data-i="adLead"></p>
+    <div class="adapt" id="adapt"></div>
+  </section>
+
+  <div class="cta">
+    <h2 class="serif" data-i="ctaTitle"></h2>
+    <p data-i="ctaText"></p>
+    <a class="btn contact" target="_blank" rel="noopener" data-i="write"></a>
+  </div>
+  <footer data-i="foot"></footer>
+</div>
+
+<script>
+"use strict";
+/* ↓↓↓ Your Telegram username without @ (e.g. "didar_bots"). Empty = contact buttons are hidden. */
+const TG = "";
+/* The live shop. On GitHub Pages this page sits next to the webapp/ folder. */
+const SHOP = "webapp/?shop=example_flowers";
+
+const T = {
+  ru: {
+    brand: "Telegram-боты для бизнеса", write: "Написать в Telegram", ask: "Обсудить проект",
+    heroTag: "Демо-проект · цветочный магазин",
+    heroTitle: "Заказы прямо в Telegram — без переписки и потерянных сообщений",
+    heroText: "Бот с каталогом и корзиной + магазин внутри Telegram. Покупатель выбирает товары, оставляет имя, телефон и адрес, а владелец сразу получает готовый заказ в свою группу.",
+    openShop: "Открыть демо-магазин", f1: "два языка", f2b: "2 версии", f2: "чат-бот и магазин", f3: "принимает заказы",
+    live: "Это живое демо — можно листать и добавлять в корзину",
+    vTag: "Что входит", vTitle: "Два варианта под задачу", vLead: "Обе версии работают в одном боте: можно дать покупателю выбор — витрина или привычный чат.",
+    aTag: "Магазин · Mini App", aTitle: "Витрина внутри Telegram", aText: "Открывается кнопкой в боте и выглядит как приложение.",
+    aList: ["Большие фото, категории, поиск", "Плавающая корзина и «С этим покупают»", "Доставка / самовывоз, бесплатная доставка от суммы", "Светлая и тёмная тема"],
+    bTag: "Чат-бот", bTitle: "Заказ кнопками в чате", bText: "Всё прямо в переписке — подходит для любых телефонов.",
+    bList: ["Каталог по категориям с фото и ценами", "Корзина, имя, номер одной кнопкой, адрес", "Раздел «О нас» и частые вопросы", "Команда /orders — последние заказы"],
+    cTag: "Как это выглядит", cTitle: "Покупатель и владелец", cLead: "Слева — что видит покупатель после заказа, справа — что приходит в группу магазина. Тексты взяты из настоящего бота.",
+    bot: "бот", capA: "Покупатель", groupName: "Заказы · Gulzor", group: "группа магазина", capB: "Владелец и менеджеры",
+    hTag: "Как работает", hTitle: "Три шага до заказа",
+    s1b: "Выбор", s1: "Покупатель открывает бота, смотрит каталог и складывает товары в корзину.",
+    s2b: "Оформление", s2: "Имя, телефон, доставка или самовывоз, комментарий к заказу.",
+    s3b: "Заказ у владельца", s3: "Готовая заявка приходит в группу: состав, сумма, контакты, кнопка «Написать клиенту».",
+    feat: [["🌐","Русский и узбекский"],["🛡","Цены проверяются на сервере"],["🔔","Заказы в Telegram-группу"],["📱","Телефон и компьютер"]],
+    adTag: "Не только цветы", adTitle: "Можно сделать под ваш бизнес", adLead: "Та же основа подходит для других задач — каталог и форма меняются под вас.",
+    adapt: [["🎓","Учебный центр","Запись на пробный урок, заявки с рекламы — в группу"],["💇","Салон и барбер","Запись к мастеру и напоминания клиентам"],["🍰","Кондитерская и кафе","Меню, заказ на дату, самовывоз или доставка"]],
+    ctaTitle: "Хотите такой бот для себя?", ctaText: "Сначала покажу бесплатное демо с вашими товарами — платите, только если понравится.",
+    foot: "Демо-проект. Магазин «Gulzor Flowers» вымышленный, фото — Unsplash."
+  },
+  uz: {
+    brand: "Biznes uchun Telegram-botlar", write: "Telegramda yozish", ask: "Loyihani muhokama qilish",
+    heroTag: "Demo-loyiha · gul do'koni",
+    heroTitle: "Buyurtmalar to'g'ridan-to'g'ri Telegramda — yozishmalarsiz",
+    heroText: "Katalog va savatli bot + Telegram ichidagi do'kon. Xaridor mahsulot tanlaydi, ismi, telefoni va manzilini qoldiradi — egasi esa tayyor buyurtmani guruhida darhol oladi.",
+    openShop: "Demo-do'konni ochish", f1: "ikki til", f2b: "2 versiya", f2: "chat-bot va do'kon", f3: "buyurtma qabul qiladi",
+    live: "Bu jonli demo — varaqlash va savatga qo'shish mumkin",
+    vTag: "Nimalar kiradi", vTitle: "Vazifaga qarab ikki variant", vLead: "Ikkala versiya bitta botda ishlaydi: xaridor vitrina yoki odatiy chatni tanlashi mumkin.",
+    aTag: "Do'kon · Mini App", aTitle: "Telegram ichidagi vitrina", aText: "Botdagi tugma orqali ochiladi va ilovaga o'xshaydi.",
+    aList: ["Katta rasmlar, kategoriyalar, qidiruv", "Suzuvchi savat va «Bular bilan olishadi»", "Yetkazish / olib ketish, summadan bepul yetkazish", "Yorug' va qorong'i mavzu"],
+    bTag: "Chat-bot", bTitle: "Chatda tugmalar bilan buyurtma", bText: "Hammasi yozishmaning o'zida — har qanday telefonga mos.",
+    bList: ["Rasm va narxli kategoriyalar bo'yicha katalog", "Savat, ism, raqam bitta tugmada, manzil", "«Biz haqimizda» va ko'p so'raladigan savollar", "/orders buyrug'i — oxirgi buyurtmalar"],
+    cTag: "Qanday ko'rinadi", cTitle: "Xaridor va do'kon egasi", cLead: "Chapda — xaridor buyurtmadan keyin ko'radigan narsa, o'ngda — do'kon guruhiga keladigan xabar. Matnlar haqiqiy botdan olingan.",
+    bot: "bot", capA: "Xaridor", groupName: "Buyurtmalar · Gulzor", group: "do'kon guruhi", capB: "Egasi va menejerlar",
+    hTag: "Qanday ishlaydi", hTitle: "Buyurtmagacha uch qadam",
+    s1b: "Tanlash", s1: "Xaridor botni ochadi, katalogni ko'radi va mahsulotlarni savatga soladi.",
+    s2b: "Rasmiylashtirish", s2: "Ism, telefon, yetkazish yoki olib ketish, izoh.",
+    s3b: "Buyurtma egasida", s3: "Tayyor buyurtma guruhga keladi: tarkibi, summasi, kontaktlar, «Mijozga yozish» tugmasi.",
+    feat: [["🌐","Rus va o'zbek tili"],["🛡","Narxlar serverda tekshiriladi"],["🔔","Buyurtmalar Telegram-guruhga"],["📱","Telefon va kompyuter"]],
+    adTag: "Faqat gullar emas", adTitle: "Biznesingizga moslab qilish mumkin", adLead: "Xuddi shu asos boshqa vazifalarga ham mos — katalog va forma sizga moslashtiriladi.",
+    adapt: [["🎓","O'quv markazi","Sinov darsiga yozilish, reklamadan arizalar — guruhga"],["💇","Salon va barber","Ustaga yozilish va mijozlarga eslatmalar"],["🍰","Qandolatchilik va kafe","Menyu, sanaga buyurtma, olib ketish yoki yetkazish"]],
+    ctaTitle: "Sizga ham shunday bot kerakmi?", ctaText: "Avval mahsulotlaringiz bilan bepul demo ko'rsataman — yoqsa, keyin to'laysiz.",
+    foot: "Demo-loyiha. «Gulzor Flowers» do'koni o'ylab topilgan, rasmlar — Unsplash."
+  }
+};
+
+/* Chat mock: the bot's real messages (texts.py), shortened. */
+const CHAT = {
+  ru: {
+    a: [
+      ["me", "/start"],
+      ["bot", "🌸 <b>Gulzor Flowers</b><br>Свежие цветы с доставкой по Ташкенту<br><br>Нажмите «🌸 Открыть магазин» внизу — каталог с фото, корзина и заказ за минуту 👇"],
+      ["kb", [["g", "🌸 Открыть магазин"], ["", "💬 Заказать в чате"]]],
+      ["bot", "🧾 <b>Ваш заказ</b><hr>1. 15 красных роз × 2 — 500 000 сум<br>2. 51 роза × 1 — 650 000 сум<hr>🚚 Доставка: бесплатно<br>💰 <b>Итого: 1 150 000 сум</b>"],
+      ["bot", "🎉 <b>Спасибо! Заказ №17 принят.</b><br><br>Менеджер скоро свяжется с вами для подтверждения."]
+    ],
+    b: [
+      ["bot", "🆕 <b>Новый заказ №17</b><hr>1. 15 красных роз × 2 — 500 000 сум<br>2. 51 роза × 1 — 650 000 сум<hr>💰 <b>Итого: 1 150 000 сум</b><br>👤 Имя: Азиз<br>📞 Телефон: +998 90 123 45 67<br>📦 Способ: доставка<br>📍 Адрес: Юнусабад, 4 квартал<br>💬 Комментарий: к 18:00, открытка «С днём рождения»"],
+      ["kb", [["b", "💬 Написать клиенту"]]],
+      ["me", "/orders"],
+      ["bot", "№17 · 2026-11-22 14:05 · Азиз · +998 90 123 45 67 · 1 150 000 сум<br>№16 · 2026-11-22 11:40 · Мадина · +998 93 555 12 34 · 380 000 сум"]
+    ]
+  },
+  uz: {
+    a: [
+      ["me", "/start"],
+      ["bot", "🌸 <b>Gulzor Flowers</b><br>Toshkent bo'ylab yetkazib beriladigan yangi gullar<br><br>Pastdagi «🌸 Do'konni ochish» tugmasini bosing — rasmli katalog, savat va bir daqiqada buyurtma 👇"],
+      ["kb", [["g", "🌸 Do'konni ochish"], ["", "💬 Chatda buyurtma"]]],
+      ["bot", "🧾 <b>Buyurtmangiz</b><hr>1. 15 ta qizil atirgul × 2 — 500 000 so'm<br>2. 51 ta atirgul × 1 — 650 000 so'm<hr>🚚 Yetkazish: bepul<br>💰 <b>Jami: 1 150 000 so'm</b>"],
+      ["bot", "🎉 <b>Rahmat! №17 buyurtma qabul qilindi.</b><br><br>Tez orada menejer tasdiqlash uchun siz bilan bog'lanadi."]
+    ],
+    b: [
+      ["bot", "🆕 <b>Yangi buyurtma №17</b><hr>1. 15 ta qizil atirgul × 2 — 500 000 so'm<br>2. 51 ta atirgul × 1 — 650 000 so'm<hr>💰 <b>Jami: 1 150 000 so'm</b><br>👤 Ism: Aziz<br>📞 Telefon: +998 90 123 45 67<br>📦 Usul: yetkazish<br>📍 Manzil: Yunusobod, 4-kvartal<br>💬 Izoh: 18:00 gacha, «Tug'ilgan kuning bilan» otkritkasi"],
+      ["kb", [["b", "💬 Mijozga yozish"]]],
+      ["me", "/orders"],
+      ["bot", "№17 · 2026-11-22 14:05 · Aziz · +998 90 123 45 67 · 1 150 000 so'm<br>№16 · 2026-11-22 11:40 · Madina · +998 93 555 12 34 · 380 000 so'm"]
+    ]
+  }
+};
+
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+let lang = "ru";
+try {
+  const saved = localStorage.getItem("lang");
+  if (saved === "uz" || saved === "ru") lang = saved;
+  else if (/^uz/i.test(navigator.language || "")) lang = "uz";
+} catch (e) {}
+
+function chat(list) {
+  return list.map(([who, v]) => who === "kb"
+    ? `<div class="kb">${v.map(([c, txt]) => `<span class="${c}">${esc(txt)}</span>`).join("")}</div>`
+    : `<div class="m ${who === "me" ? "me" : ""}">${who === "me" ? esc(v) : v}</div>`).join("");
+}
+
+function render() {
+  const d = T[lang];
+  document.documentElement.lang = lang;
+  document.title = d.brand;
+  document.querySelectorAll("[data-i]").forEach(el => { el.textContent = d[el.dataset.i]; });
+  document.querySelectorAll("[data-list]").forEach(el => { el.innerHTML = d[el.dataset.list].map(x => `<li>${esc(x)}</li>`).join(""); });
+  document.getElementById("feat").innerHTML = d.feat.map(([i, x]) => `<div><i>${i}</i>${esc(x)}</div>`).join("");
+  document.getElementById("adapt").innerHTML = d.adapt.map(([i, b, x]) => `<div><i>${i}</i><b>${esc(b)}</b><span>${esc(x)}</span></div>`).join("");
+  document.getElementById("chatA").innerHTML = chat(CHAT[lang].a);
+  document.getElementById("chatB").innerHTML = chat(CHAT[lang].b);
+  document.querySelectorAll("[data-lang]").forEach(b => b.classList.toggle("on", b.dataset.lang === lang));
+  const shopUrl = SHOP + "&lang=" + lang;
+  document.getElementById("openShop").href = shopUrl;
+  const frame = document.getElementById("shopFrame");
+  if (frame.dataset.lang !== lang) { frame.src = shopUrl; frame.dataset.lang = lang; }
+}
+
+const user = TG.replace(/^@/, "").replace(/[^A-Za-z0-9_]/g, "");
+document.querySelectorAll(".contact").forEach(a => { if (user) a.href = "https://t.me/" + user; else a.hidden = true; });
+document.addEventListener("click", e => {
+  const b = e.target.closest("[data-lang]"); if (!b) return;
+  lang = b.dataset.lang;
+  try { localStorage.setItem("lang", lang); } catch (err) {}
+  render();
+});
+render();
+</script>
+</body>
+</html>
